@@ -198,6 +198,7 @@ export default function App() {
           <>
             {!loggedCounselor || activeTab === 'counselor-login' ? (
               <CounselorLogin
+                counselors={counselors}
                 onBack={() => handleSwitchPortal('landing')}
                 onLoginSuccess={handleCounselorLoginSuccess}
               />

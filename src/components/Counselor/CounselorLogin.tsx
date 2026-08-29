@@ -1,32 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, Shield, ArrowLeft, KeyRound, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { Lock, ArrowLeft, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { Counselor } from '../../types';
 import { INITIAL_COUNSELORS } from '../../data/initialData';
 
 interface CounselorLoginProps {
+  counselors?: Counselor[];
   onBack: () => void;
   onLoginSuccess: (counselor: Counselor) => void;
 }
 
-export const CounselorLogin: React.FC<CounselorLoginProps> = ({ onBack, onLoginSuccess }) => {
-  const [counselors, setCounselors] = useState<Counselor[]>(INITIAL_COUNSELORS);
-  const [selectedCounselorId, setSelectedCounselorId] = useState(INITIAL_COUNSELORS[0]?.id || 'c-1');
+export const CounselorLogin: React.FC<CounselorLoginProps> = ({ 
+  counselors: counselorsProp, 
+  onBack, 
+  onLoginSuccess 
+}) => {
+  const [counselors, setCounselors] = useState<Counselor[]>(
+    counselorsProp && counselorsProp.length > 0 ? counselorsProp : INITIAL_COUNSELORS
+  );
+  const [selectedCounselorId, setSelectedCounselorId] = useState(
+    counselorsProp && counselorsProp.length > 0 ? counselorsProp[0].id : (INITIAL_COUNSELORS[0]?.id || 'c-1')
+  );
   const [passcode, setPasscode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetch('/api/counselors')
-      .then(res => res.json())
-      .then(data => {
-        if (data.counselors && Array.isArray(data.counselors) && data.counselors.length > 0) {
-          setCounselors(data.counselors);
-          setSelectedCounselorId(data.counselors[0].id);
-        }
-      })
-      .catch(() => {});
-  }, []);
+    if (counselorsProp && counselorsProp.length > 0) {
+      setCounselors(counselorsProp);
+      // Ensure selected counselor id is valid
+      if (!counselorsProp.some(c => c.id === selectedCounselorId)) {
+        setSelectedCounselorId(counselorsProp[0].id);
+      }
+    } else {
+      fetch('/api/counselors')
+        .then(res => res.json())
+        .then(data => {
+          if (data.counselors && Array.isArray(data.counselors) && data.counselors.length > 0) {
+            setCounselors(data.counselors);
+            if (!data.counselors.some((c: Counselor) => c.id === selectedCounselorId)) {
+              setSelectedCounselorId(data.counselors[0].id);
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [counselorsProp, selectedCounselorId]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +74,7 @@ export const CounselorLogin: React.FC<CounselorLoginProps> = ({ onBack, onLoginS
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-xs font-bold text-[#5C6B5E] hover:text-[#1B4332] transition-colors"
+          className="flex items-center gap-1.5 text-xs font-bold text-[#5C6B5E] hover:text-[#1B4332] transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kembali ke Halaman Depan</span>
@@ -88,16 +107,16 @@ export const CounselorLogin: React.FC<CounselorLoginProps> = ({ onBack, onLoginS
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-[#1B4332] uppercase tracking-wider mb-1.5 font-serif">
-              Pilih Profil Guru BK
+              Pilih Nama Guru BK
             </label>
             <select
               value={selectedCounselorId}
               onChange={(e) => setSelectedCounselorId(e.target.value)}
-              className="w-full bg-[#FDFBF7] border border-[#E9E4D9] rounded-2xl p-3 text-xs sm:text-sm font-medium outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:bg-white text-[#1B4332]"
+              className="w-full bg-[#FDFBF7] border border-[#E9E4D9] rounded-2xl p-3.5 text-sm font-medium outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:bg-white text-[#1B4332] cursor-pointer"
             >
-              {counselors.map(c => (
+              {counselors.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.name} — {c.assignedGrade}
+                  {c.name}
                 </option>
               ))}
             </select>
@@ -119,7 +138,7 @@ export const CounselorLogin: React.FC<CounselorLoginProps> = ({ onBack, onLoginS
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3 text-[#8C8475] hover:text-[#1B4332] text-xs font-medium flex items-center gap-1"
+                className="absolute right-3 top-3 text-[#8C8475] hover:text-[#1B4332] text-xs font-medium flex items-center gap-1 cursor-pointer"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>

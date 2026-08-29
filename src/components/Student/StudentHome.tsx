@@ -59,7 +59,7 @@ export const StudentHome: React.FC<StudentHomeProps> = ({
     counselorsList.find(c => (c.role || '').toLowerCase().includes('koordinator')) || 
     counselorsList[0];
 
-  const primaryCleanPhone = (primaryCounselor?.whatsapp || primaryCounselor?.phone || '082329180233').replace(/[^0-9]/g, '');
+  const primaryCleanPhone = (primaryCounselor?.whatsapp || primaryCounselor?.phone || '0895362132613').replace(/[^0-9]/g, '');
   const primaryWaUrl = primaryCleanPhone.startsWith('0')
     ? `https://wa.me/62${primaryCleanPhone.slice(1)}`
     : `https://wa.me/${primaryCleanPhone}`;
@@ -308,7 +308,7 @@ export const StudentHome: React.FC<StudentHomeProps> = ({
         <div className="space-y-1 flex-1">
           <span className="font-bold text-[#1B4332] block">Memerlukan Pendampingan Segera?</span>
           <p className="leading-relaxed">
-            Jika kamu atau temanmu sedang dalam ancaman atau membutuhkan bantuan mendesak, segera temui guru piket di madrasah atau hubungi Guru BK <strong>{primaryCounselor?.name || 'Siska Noviana Dewi, M.Sc.'}</strong> via WhatsApp di{' '}
+            Jika kamu atau temanmu sedang dalam ancaman atau membutuhkan bantuan mendesak, segera temui guru piket di madrasah atau hubungi Guru BK <strong>{primaryCounselor?.name || 'Siska Noviana Dewi, S.Si., M.Sc.'}</strong> via WhatsApp di{' '}
             <a 
               href={primaryWaUrl} 
               target="_blank" 

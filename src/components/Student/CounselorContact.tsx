@@ -36,7 +36,7 @@ export const CounselorContact: React.FC<CounselorContactProps> = ({ counselors: 
     counselors.find(c => (c.role || '').toLowerCase().includes('koordinator')) || 
     counselors[0];
 
-  const primaryCleanPhone = (primaryCounselor?.whatsapp || primaryCounselor?.phone || '082329180233').replace(/[^0-9]/g, '');
+  const primaryCleanPhone = (primaryCounselor?.whatsapp || primaryCounselor?.phone || '0895362132613').replace(/[^0-9]/g, '');
   const primaryWaUrl = primaryCleanPhone.startsWith('0')
     ? `https://wa.me/62${primaryCleanPhone.slice(1)}`
     : `https://wa.me/${primaryCleanPhone}`;
@@ -166,7 +166,7 @@ export const CounselorContact: React.FC<CounselorContactProps> = ({ counselors: 
           <span>Layanan Darurat & Keselamatan Siswa</span>
         </div>
         <p className="leading-relaxed text-xs">
-          Jika kamu atau temanmu dalam bahaya fisik mendesak di madrasah, segera temui guru piket terdekat atau hubungi Guru BK <strong>{primaryCounselor?.name || 'Siska Noviana Dewi, M.Sc.'}</strong> di nomor WhatsApp{' '}
+          Jika kamu atau temanmu dalam bahaya fisik mendesak di madrasah, segera temui guru piket terdekat atau hubungi Guru BK <strong>{primaryCounselor?.name || 'Siska Noviana Dewi, S.Si., M.Sc.'}</strong> di nomor WhatsApp{' '}
           <a 
             href={primaryWaUrl} 
             target="_blank" 

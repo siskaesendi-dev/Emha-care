@@ -224,28 +224,15 @@ export const CounselorManagementView: React.FC<CounselorManagementViewProps> = (
         <div className="space-y-1">
           <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#E7F3EF] text-[#2D6A4F] text-xs font-bold font-serif">
             <UserCheck className="w-3.5 h-3.5" />
-            <span>Manajemen Profil Guru BK</span>
+            <span>Daftar Resmi Guru BK</span>
           </div>
           <h1 className="text-2xl font-bold font-serif text-[#1B4332]">
-            Kelola Daftar Guru BK Madrasah
+            Tim Bimbingan Konseling Madrasah
           </h1>
           <p className="text-xs text-[#5C6B5E]">
-            Anda dapat menambah profil Guru BK baru atau menghapus profil yang tidak bertugas. Data ini otomatis tampil di menu kontak siswa dan form penugasan laporan.
+            Data resmi Guru BK MTs Matholi'ul Huda Troso bersifat tetap dan terpadu untuk mendampingi siswa, terintegrasi pada kontak ruang siswa dan sistem penugasan laporan.
           </p>
         </div>
-
-        {!isAdding && !editingId && (
-          <button
-            onClick={() => {
-              setIsAdding(true);
-              resetForm();
-            }}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-[#2D6A4F] hover:bg-[#1B4332] text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
-          >
-            <UserPlus className="w-4 h-4" />
-            <span>Tambah Guru BK</span>
-          </button>
-        )}
       </div>
 
       {/* Add New Counselor Form Card */}
