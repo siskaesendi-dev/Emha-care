@@ -1,38 +1,52 @@
 export const SAHABAT_SYSTEM_INSTRUCTION = `
-Kamu adalah "Sahabat", teman digital yang sangat hangat, ramah, peduli, dan sabar untuk siswa MTs (SMP sederajat) di madrasah melalui aplikasi anti-bullying EMHA CARE.
+Kamu adalah "Buddy", seorang teman dekat yang hangat, sangat empati, pendengar yang baik, dan adaptif saat berbincang dengan siswa di sekolah (MTs Matholi'ul Huda Troso). Tugas utamamu adalah menjadi tempat curhat dan ruang aman bagi siswa.
 
-TUGAS UTAMA:
-Mendengarkan, menemani, dan merespons setiap cerita, pertanyaan, maupun curhatan siswa secara SANGAT NATURAL seperti sahabat karib di dunia nyata (bukan robot, bukan kuesioner kaku, dan bukan jawaban template).
+ATURAN UTAMA BERPERILAKU:
 
-PANDUAN GAYA BICARA & RESPON:
-1. RESPON LANGSUNG KE INTI PERASAAN / TOPIK SISWA:
-   - JANGAN PERNAH mengetik ulang atau mengutip kata demi kata kalimat pelapor (seperti "Tentang [jawaban siswa]" atau "Saat kamu bilang [jawaban siswa]").
-   - Langsung tanggapi dan respon situasi/pertanyaannya secara alami layaknya teman dekat.
-   - Contoh jika siswa bilang "saya belum makan" -> langsung jawab: "Sobat, kenapa belum makan? Apakah ada yang mengganggumu, uang jajanmu habis/diambil, atau kamu sedang tidak nafsu makan? Cerita ke aku ya."
-   - Contoh jika siswa cerita uangnya dipalak -> langsung tanggapi rasa cemasnya dan tanyakan di mana kejadiannya.
-2. PANGGIL DENGAN AKRAB: Gunakan sapaan akrab "Sobat" atau gaya bicara "aku/kamu" yang santai, hangat, dan menenangkan khas remaja madrasah.
-3. EMPATI & VALIDASI: Selalu akui dan validasi perasaan siswa sebelum menanyakan 1 hal lanjutan yang relevan.
-4. RINGKAS & NATURAL: Panjang balasan maksimal 2-3 kalimat per giliran agar mengalir santai seperti chatting dengan teman sejati.
-5. JANGAN PERNAH memberikan jawaban yang kaku atau mengabaikan topik yang dibawa siswa.
+1. GAYA BAHASA & TONE:
+   - Gunakan bahasa Indonesia yang santai, ramah, dan alami seperti teman seumuran yang peduli (selalu gunakan kata "Aku" dan "Kamu").
+   - Hindari gaya bahasa yang kaku, terlalu formal, klise, atau seperti robot/Customer Service.
+   - JANGAN langsung memberikan penilaian, analisis perundungan/bullying, atau solusi di awal sebelum diminta. Jangan sok tahu atau menginterogasi siswa.
 
-ATURAN KEAMANAN KRITIS:
-Jika siswa menyebut tanda ingin menyakiti diri sendiri, keputusasaan ekstrem, atau bahaya fisik langsung, segera tunjukkan kepedulian mendalam dan dorong dengan lembut untuk segera berbicara kepada Guru BK atau orang dewasa terpercaya sekarang juga.
+2. ADAPTASI EMOSI (EMPATHY MATCHING):
+   - SEDIH / TRAUMA / CEMAS (misal: diejek, dipukul, dipalak, dikucilkan, takut masuk sekolah):
+     Berikan empati mendalam, validasi perasaannya terlebih dahulu, dan tunjukkan bahwa kamu ada di sisinya (contoh: "Aku paham banget perasaanmu...", "Pasti berat banget ya berada di posisi itu... Kamu hebat sudah kuat sampai sekarang").
+   - POSITIF / SEHAT / GEMBIRA (misal: dapat nilai bagus, menang lomba, hari menyenangkan, dapat teman baru):
+     Tunjukkan rasa senang yang tulus dan ikut bersemangat bersama mereka (contoh: "Wah, keren banget! Ikut senang dengarnya! Gimana ceritanya tuh?").
+   - MENYAPA / KABAR SANTAI (misal: "Halo", "Hai", "Apa kabar", "Lagi ngapain"):
+     Jawab sapaan dengan hangat, ramah, dan tanyakan kabarnya atau apa yang ingin dia bagikan hari ini.
+
+3. ALUR PERCAKAPAN (NARRATIVE FLOW):
+   - Jangan pernah mengetik ulang atau mengutip kata demi kata kalimat siswa secara kaku.
+   - Alih-alih langsung menganalisis, ajukan pertanyaan reflektif yang lembut satu per satu untuk mendengarkan cerita lengkapnya secara mengalir.
+   - Berikan ruang seluas-luasnya agar siswa meluapkan perasaannya terlebih dahulu sampai dia merasa lega.
+   - Buat jawaban ringkas, hangat, dan alami (2-3 kalimat per pesan) agar terasa seperti chat nyata antar-sahabat.
+
+4. BATASAN & PENUTUP CERITA:
+   - Jika siswa sudah selesai bercerita, merasa lebih lega, atau meminta saran/analisis/bantuan:
+     Berikan tanggapan yang menenangkan dan menguatkan hati, lalu tanyakan dengan lembut apakah dia ingin cerita ini diteruskan ke Guru BK (Bu Siska) agar mendapat perlindungan dan bantuan nyata di sekolah.
+
+5. KEAMANAN KRITIS:
+   - Jika siswa menunjukkan tanda ingin menyakiti diri sendiri, keputusasaan ekstrem, atau bahaya fisik darurat, tanggapi dengan kasih sayang mendalam dan dorong dengan lembut untuk segera berbicara langsung kepada Guru BK atau orang dewasa terpercaya saat ini juga.
 `;
 
 /**
- * Intelligent contextual response generator for natural conversations
- * when offline or when fallback is needed.
+ * Intelligent contextual response generator adhering to Buddy's 4 core rules
+ * for offline, error fallback, or immediate natural response.
  */
 export function generateNaturalSahabatResponse(messages: { role: string; text: string }[]): string {
   if (!messages || messages.length === 0) {
-    return 'Halo Sobat! Aku Sahabat di EMHA CARE. Ada hal yang sedang kamu rasakan atau alami di madrasah? Ceritakan santai ke aku ya.';
+    return 'Hai! Aku Buddy, teman dekatmu di sini. Ruang ini aman dan rahasia buat kamu bercerita apa pun. Ada hal yang ingin kamu bagi atau ceritakan hari ini?';
   }
 
   const latestMessage = messages[messages.length - 1]?.text || '';
   const cleanText = latestMessage.trim();
   const lower = cleanText.toLowerCase();
 
-  // 1. Safety critical triggers
+  // Count user turns to gauge narrative flow
+  const userTurnCount = messages.filter(m => m.role === 'user').length;
+
+  // 1. SAFETY CRITICAL TRIGGERS
   if (
     lower.includes('bunuh diri') ||
     lower.includes('akhiri hidup') ||
@@ -41,10 +55,78 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('sayat tangan') ||
     lower.includes('lukai diri')
   ) {
-    return 'Sobat, kakak sangat peduli padamu dan kamu sangat berharga. Tolong, ini penting sekali: bicaralah pada Guru BK (Bu Siska) atau orang dewasa terpercaya SEKARANG JUGA ya. Kamu tidak sendirian dan kami di sini siap membantumu.';
+    return 'Aku sangat peduli sama kamu dan kamu itu berharga banget. Tolong, ini penting sekali: bicaralah ke Guru BK (Bu Siska) atau orang dewasa terpercaya sekarang juga ya. Kamu tidak sendirian, dan ada banyak orang yang sayang dan siap membantumu.';
   }
 
-  // 2. Hunger, food, skipped meals (Exact scenario requested: "saya belum makan")
+  // 2. CLOSURE / ASKING FOR ADVICE / RESOLUTION
+  // Rule 4: Jika siswa sudah selesai bercerita atau meminta saran/bantuan
+  if (
+    lower.includes('harus gimana') ||
+    lower.includes('harus bagaimana') ||
+    lower.includes('minta saran') ||
+    lower.includes('kasih saran') ||
+    lower.includes('solusi') ||
+    lower.includes('tolong aku') ||
+    lower.includes('bisa bantu') ||
+    lower.includes('udah selesai cerita') ||
+    lower.includes('sudah lega') ||
+    lower.includes('makasih ya') ||
+    lower.includes('terima kasih ya')
+  ) {
+    if (lower.includes('makasih') || lower.includes('terima kasih') || lower.includes('sudah lega')) {
+      return 'Sama-sama! Aku senang banget kalau kamu merasa sedikit lebih lega setelah cerita. Kalau nanti kamu butuh teman ngobrol lagi, aku selalu ada di sini. Mau ceritamu ini dibantu teruskan ke Guru BK supaya ada pendampingan langsung di sekolah?';
+    }
+    return 'Kamu sudah hebat banget mau bertahan dan berani cerita ini ke aku. Untuk langkah terbaiknya, mau nggak kalau ceritamu ini kita teruskan ke Guru BK (Bu Siska) secara aman, supaya kamu dapat bantuan dan perlindungan nyata di sekolah?';
+  }
+
+  // 3. POSITIVE / HEALTHY EMOTIONS (Rule 2)
+  if (
+    lower.includes('senang') ||
+    lower.includes('bahagia') ||
+    lower.includes('kabar baik') ||
+    lower.includes('alhamdulillah') ||
+    lower.includes('menang') ||
+    lower.includes('juara') ||
+    lower.includes('dapat nilai') ||
+    lower.includes('seru banget') ||
+    lower.includes('asyik') ||
+    lower.includes('happy') ||
+    lower.includes('dapet temen') ||
+    lower.includes('punya teman baru')
+  ) {
+    return 'Wah, keren banget! Aku ikut senang dan bersemangat dengarnya! Ceritain dong, hal apa yang paling bikin harimu jadi seseru itu?';
+  }
+
+  // 4. GREETINGS & INTRODUCTIONS (Rule 2 & 1)
+  if (
+    lower === 'halo' ||
+    lower === 'hai' ||
+    lower === 'haii' ||
+    lower === 'hei' ||
+    lower === 'halo buddy' ||
+    lower === 'hai buddy' ||
+    lower === 'assalamualaikum' ||
+    lower === 'assalamu\'alaikum' ||
+    lower === 'p' ||
+    lower === 'tes' ||
+    lower === 'pagi' ||
+    lower === 'siang' ||
+    lower === 'sore' ||
+    lower === 'malam' ||
+    lower === 'kabar baik' ||
+    lower === 'baik'
+  ) {
+    if (lower.includes('assalam')) {
+      return 'Waalaikumsalam! Senang banget kamu mampir ke sini. Gimana harimu di madrasah hari ini? Ada yang ingin kamu bagi atau ceritakan ke aku?';
+    }
+    if (lower === 'kabar baik' || lower === 'baik') {
+      return 'Syukurlah kalau kabarmu baik! Aku senang mendengarnya. Ada cerita seru atau hal menarik apa yang lagi kamu alami hari ini?';
+    }
+    return 'Hai juga! Aku Buddy, senang bisa ngobrol sama kamu. Gimana kabarmu hari ini? Ada yang lagi kamu rasakan atau mau diceritakan santai ke aku?';
+  }
+
+  // 5. SADNESS / TRAUMA / ANXIETY / BULLYING THEMES (Rule 2 - Empathy Matching)
+  // 5a. Hunger / Skipped Meals / Food taken
   if (
     lower.includes('belum makan') ||
     lower.includes('tidak makan') ||
@@ -55,12 +137,12 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('bekal diambil')
   ) {
     if (lower.includes('diambil') || lower.includes('dibuang')) {
-      return 'Sobat, bekal atau makananmu diambil orang lain ya? Itu perbuatan yang tidak boleh dibiarkan. Kamu sekarang lapar tidak? Boleh cerita siapa atau di mana kejadiannya?';
+      return 'Pasti sedih dan kesal banget ya kalau makananmu diperlakukan seperti itu... Kamu sekarang masih lapar nggak? Mau cerita kejadiannya tadi seperti apa?';
     }
-    return 'Sobat, kenapa kamu belum makan? Apakah ada yang mengganggumu, uang jajanmu habis/diambil, atau kamu sedang tidak nafsu makan? Ceritakan ke aku ya.';
+    return 'Kenapa kamu belum makan? Apakah ada hal yang mengganggumu di sekolah, uang jajanmu habis/diambil, atau kamu lagi nggak nafsu makan? Cerita ke aku ya, aku ada di sini.';
   }
 
-  // 3. Extortion / Money taken / Malak
+  // 5b. Extortion / Malak / Money issues
   if (
     lower.includes('uang') ||
     lower.includes('palak') ||
@@ -69,10 +151,10 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('duit') ||
     lower.includes('jajan')
   ) {
-    return 'Sobat, uang jajanmu diminta paksa sama orang lain di madrasah ya? Pasti bikin kaget dan bingung banget... Di bagian mana kejadiannya, apakah dekat lorong atau kantin?';
+    return 'Pasti kaget, takut, dan bingung banget ya saat uangmu diminta paksa... Aku paham perasaanmu. Boleh ceritakan pelan-pelan di mana kejadian itu biasanya terjadi?';
   }
 
-  // 4. Verbal abuse / Teasing / Mocking / Nicknames
+  // 5c. Verbal bullying / Ejekan / Body shaming / Panggilan jelek
   if (
     lower.includes('diejek') ||
     lower.includes('dipanggil') ||
@@ -84,12 +166,13 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('body shaming') ||
     lower.includes('gemuk') ||
     lower.includes('item') ||
-    lower.includes('kurus')
+    lower.includes('kurus') ||
+    lower.includes('jelek')
   ) {
-    return 'Sobat, dipanggil sebutan jelek atau diejek terus-menerus itu pasti bikin sakit hati dan risih. Sudah seringkah mereka mengejekmu seperti itu di kelas?';
+    return 'Pasti sakit dan risih banget rasanya ya kalau diejek seperti itu... Perasaanmu itu wajar banget. Apakah hal itu sering terjadi di kelas saat jam pelajaran atau pas istirahat?';
   }
 
-  // 5. Cyberbullying / Photos leaked / WhatsApp group / Social media
+  // 5d. Cyberbullying / WhatsApp / Foto disebar
   if (
     lower.includes('foto') ||
     lower.includes('whatsapp') ||
@@ -102,10 +185,10 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('stiker') ||
     lower.includes('diedit')
   ) {
-    return 'Sobat, hal seperti menyebarkan foto atau stiker tanpa izin itu keterlaluan dan bikin malu banget. Apakah fotonya masih terus disebarkan di grup sampai sekarang?';
+    return 'Duh, pasti bikin malu dan nggak nyaman banget ya... Tindakan menyebarkan hal seperti itu tanpa izin memang sama sekali nggak bener. Kejadiannya baru saja atau sudah dari beberapa hari lalu?';
   }
 
-  // 6. Physical bullying / Pushing / Hitting / Tripping
+  // 5e. Physical violence / Hitting / Pushing / Tripping
   if (
     lower.includes('pukul') ||
     lower.includes('dipukul') ||
@@ -118,10 +201,10 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('sakit') ||
     lower.includes('luka')
   ) {
-    return 'Sobat! Kamu tidak apa-apa kan? Apakah ada bagian tubuhmu yang luka atau sakit? Perlakuan fisik kasar seperti itu sama sekali tidak dibenarkan. Kamu merasa aman sekarang?';
+    return 'Astaga, kamu nggak apa-apa kan? Pasti takut dan kaget banget rasanya... Ada bagian tubuhmu yang sakit atau luka nggak sekarang? Kamu merasa aman di posisimu saat ini?';
   }
 
-  // 7. Social exclusion / Loneliness / Shunned
+  // 5f. Social exclusion / Loneliness / Dikucilkan
   if (
     lower.includes('dikucilkan') ||
     lower.includes('dijauhi') ||
@@ -131,10 +214,10 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('ditinggal') ||
     lower.includes('dihindari')
   ) {
-    return 'Sobat, merasa sendirian dan dijauhi satu kelas itu berat banget rasanya di hati. Ingat ya, kamu berharga dan tidak ada yang salah dengan dirimu. Menurutmu, apa yang bikin mereka mulai menjauhimu?';
+    return 'Aku paham banget perasaanmu... Rasanya pasti sepi dan berat banget saat merasa dijauhi teman-teman. Tapi ingat ya, kamu berharga dan tidak sendiri. Menurutmu, ada hal apa yang bikin suasananya jadi seperti itu?';
   }
 
-  // 8. Fear / Skipping school / Dread
+  // 5g. Fear / Dread / Skipping school / Cemas
   if (
     lower.includes('takut') ||
     lower.includes('takut masuk') ||
@@ -144,10 +227,10 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('cemas') ||
     lower.includes('was-was')
   ) {
-    return 'Sobat, wajar sekali merasa cemas atau takut kalau ada hal yang bikin kamu tidak nyaman di madrasah. Apa yang paling bikin kamu takut saat mau berangkat ke sekolah?';
+    return 'Pasti berat banget ya berada di posisi itu, sampai-sampai rasanya takut buat berangkat ke sekolah... Wajar kalau kamu merasa cemas. Apa hal yang paling bikin kamu khawatir saat mau masuk ke madrasah?';
   }
 
-  // 9. Sadness / Crying / Emotional distress
+  // 5h. Sadness / Crying / Emotional distress
   if (
     lower.includes('sedih') ||
     lower.includes('nangis') ||
@@ -157,51 +240,24 @@ export function generateNaturalSahabatResponse(messages: { role: string; text: s
     lower.includes('capek') ||
     lower.includes('lelah')
   ) {
-    return 'Sobat, kalau kamu lagi sedih atau ingin menangis, tumpahkan saja dulu ya... Jangan disimpan sendiri. Ada kejadian apa yang bikin hatimu seberat ini hari ini?';
+    return 'Kalau kamu lagi sedih atau mau menangis, tumpahkan saja ya... Nggak perlu ditahan sendiri. Aku di sini buat mendengarkanmu. Ada hal apa yang bikin hatimu seberat ini hari ini?';
   }
 
-  // 10. Questions about who Sahabat is or privacy
-  if (
-    lower.includes('siapa kamu') ||
-    lower.includes('kamu siapa') ||
-    lower.includes('apakah aman') ||
-    lower.includes('rahasia') ||
-    lower.includes('bisa apa')
-  ) {
-    return 'Aku Sahabat, teman digitalmu di EMHA CARE. Di sini ruang aman dan rahasia buatmu bercerita tanpa takut dimarahi atau dihakimi. Ada uneg-uneg yang mau kamu ceritakan ke aku, Sobat?';
-  }
-
-  // 11. Greetings & Salutations
-  if (
-    lower === 'halo' ||
-    lower === 'hai' ||
-    lower === 'haii' ||
-    lower === 'assalamualaikum' ||
-    lower === 'assalamu\'alaikum' ||
-    lower === 'p' ||
-    lower === 'tes' ||
-    lower === 'pagi' ||
-    lower === 'siang' ||
-    lower === 'sore' ||
-    lower === 'malam'
-  ) {
-    if (lower.includes('assalam')) {
-      return 'Waalaikumsalam Sobat! Senang kamu menyapa ke sini. Bagaimana harimu di madrasah hari ini? Ada cerita atau uneg-uneg yang ingin kamu bagi ke aku?';
-    }
-    return 'Halo Sobat! Ada yang sedang mengganjal di pikiran atau perasaanmu hari ini? Ceritakan saja dengan santai, aku siap mendengarkan.';
-  }
-
-  // 12. Short answers or hesitant inputs
+  // 6. SHORT AFFIRMATIONS / HESITATION
   if (cleanText.length <= 15) {
     if (lower.includes('iya') || lower.includes('ya') || lower.includes('bener') || lower.includes('betul')) {
-      return 'Aku paham, Sobat. Pasti rasanya campur aduk ya... Boleh kamu ceritakan sedikit lagi bagaimana awalnya hal itu bisa terjadi?';
+      return 'Aku mengerti... Pasti rasanya campur aduk banget ya. Boleh kamu ceritakan pelan-pelan apa yang paling bikin kamu kepikiran saat ini?';
     }
     if (lower.includes('tidak') || lower.includes('gak') || lower.includes('enggak') || lower.includes('belum')) {
-      return 'Baiklah Sobat, tidak apa-apa kalau belum siap cerita detail. Aku selalu ada di sini buat nemenin kamu. Apa yang sekarang kamu rasakan?';
+      return 'Nggak apa-apa kalau kamu belum siap cerita semuanya sekarang. Santai saja ya, aku tetap di sini menemani kamu. Apa yang lagi kamu rasakan sekarang?';
     }
-    return 'Aku mendengarkanmu dengan baik, Sobat. Boleh ceritakan pelan-pelan apa yang sebenarnya terjadi atau apa yang kamu rasakan?';
   }
 
-  // 13. General / Natural conversational response without echoing text
-  return 'Aku paham, Sobat. Hal itu pasti cukup mengganggu pikiran dan perasaanmu ya... Boleh ceritakan lebih lanjut sejak kapan kamu merasakan situasi ini?';
+  // 7. MULTI-TURN REFLECTIVE PROGRESSION (Rule 3)
+  if (userTurnCount >= 3) {
+    return 'Aku paham banget perasaanmu dan terima kasih sudah mau berbagi cerita ini ke aku. Kamu hebat sudah kuat sampai sekarang. Masih ada hal lain yang mengganjal di hatimu yang ingin kamu luapkan?';
+  }
+
+  // 8. GENERAL EMPATHETIC LISTENER RESPONSE
+  return 'Aku mendengarkanmu dengan baik. Pasti perasaan itu cukup membebani pikiranmu ya... Boleh ceritakan sedikit lagi apa yang membuatmu merasakan hal itu?';
 }

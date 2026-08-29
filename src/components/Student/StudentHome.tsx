@@ -133,10 +133,10 @@ export const StudentHome: React.FC<StudentHomeProps> = ({
                 <MessageCircleHeart className="w-5 h-5" />
               </div>
               <h3 className="font-bold text-base text-[#1B4332] font-serif group-hover:text-[#2D6A4F] transition-colors">
-                Curhat Sahabat
+                Curhat Sahabat (Buddy)
               </h3>
               <p className="text-xs text-[#5C6B5E] leading-relaxed">
-                Ceritakan unek-unek atau keresahanmu ke <strong>Sahabat AI</strong>, teman digital yang sabar & empatik tanpa menghakimi.
+                Ceritakan unek-unek atau keresahanmu ke <strong>Buddy</strong>, teman dekat yang hangat & empatik sebagai ruang amanmu.
               </p>
             </div>
 

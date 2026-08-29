@@ -66,7 +66,7 @@ app.post('/api/chat', async (req, res) => {
       lowerLatest.includes('sayat tangan')
     ) {
       return res.json({
-        text: 'Sobat, kakak sangat peduli padamu dan kamu sangat berharga. Tolong, ini penting sekali: bicaralah pada Guru BK atau orang dewasa terpercaya SEKARANG JUGA ya. Kamu tidak sendirian dan kami di sini siap membantumu.'
+        text: 'Aku sangat peduli sama kamu dan kamu itu berharga banget. Tolong, ini penting sekali: bicaralah ke Guru BK (Bu Siska) atau orang dewasa terpercaya sekarang juga ya. Kamu tidak sendirian dan kami di sini siap membantumu.'
       });
     }
 

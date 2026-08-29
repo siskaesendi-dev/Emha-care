@@ -13,7 +13,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
     {
       id: 'welcome-1',
       role: 'model',
-      text: 'Assalamualaikum. Aku "Sahabat", teman digital yang siap mendengarkan ceritamu dengan tenang dan sabar di EMHA CARE. Di sini ruang amanmu. Apa yang sedang kamu rasakan atau alami di madrasah?',
+      text: 'Hai! Aku Buddy, teman dekatmu di EMHA CARE yang siap mendengarkan ceritamu dengan hangat dan sabar. Di sini ruang aman dan rahasiamu. Ada yang lagi kamu rasakan, alami, atau ingin kamu ceritakan santai ke aku hari ini?',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -33,9 +33,9 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
 
   const quickPrompts = [
     'Ada teman yang suka mengejek dan panggil nama jelek...',
-    'Uang jajanku sering diminta paksa di lorong dekat tangga...',
+    'Uang jajanku sering diminta paksa di lorong sekolah...',
     'Fotonya diedit dan disebarkan di grup WhatsApp kelas...',
-    'Aku merasa dikucilkan dan tidak ada yang mau ajak ngobrol...',
+    'Aku merasa dikucilkan dan dijauhi teman-teman...',
   ];
 
   const handleSend = async (customText?: string) => {
@@ -138,10 +138,10 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
           </div>
           <div>
             <h2 className="text-xs font-bold text-[#1B4332] flex items-center gap-1.5">
-              <span>Sahabat</span>
+              <span>Buddy • Curhat Sahabat</span>
               <span className="w-2 h-2 rounded-full bg-[#D4A373] animate-pulse"></span>
             </h2>
-            <p className="text-[10px] text-[#5C6B5E]">Teman Cerita Digital EMHA CARE</p>
+            <p className="text-[10px] text-[#5C6B5E]">Teman Curhat & Ruang Aman Siswa</p>
           </div>
         </div>
 
@@ -151,7 +151,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
               {
                 id: 'welcome-1',
                 role: 'model',
-                text: 'Assalamualaikum. Aku "Sahabat", teman digital yang siap mendengarkan ceritamu dengan tenang dan sabar di EMHA CARE. Di sini ruang amanmu. Apa yang sedang kamu rasakan atau alami di madrasah?',
+                text: 'Hai! Aku Buddy, teman dekatmu di EMHA CARE yang siap mendengarkan ceritamu dengan hangat dan sabar. Di sini ruang aman dan rahasiamu. Ada yang lagi kamu rasakan, alami, atau ingin kamu ceritakan santai ke aku hari ini?',
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               }
             ]);
@@ -168,7 +168,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
       <div className="bg-[#F3EFED] border border-[#E9E4D9] p-3.5 rounded-2xl text-[11px] text-[#1B4332] flex items-start gap-2.5">
         <Shield className="w-4 h-4 text-[#2D6A4F] shrink-0 mt-0.5" />
         <div>
-          <strong className="text-[#2D6A4F]">Ruang Aman:</strong> Percakapan ini tidak meminta nama aslimu ataupun nama orang lain. Jika kamu ingin Guru BK membantu menindaklanjuti, kamu bisa ubah cerita ini menjadi laporan kapan saja.
+          <strong className="text-[#2D6A4F]">Ruang Aman & Rahasia:</strong> Ceritakan apa pun yang kamu rasakan tanpa rasa takut atau dihakimi. Jika kamu ingin Guru BK membantu mendampingi di sekolah, ceritamu bisa diteruskan menjadi laporan kapan saja.
         </div>
       </div>
 
@@ -222,7 +222,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F] animate-bounce"></span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F] animate-bounce [animation-delay:0.2s]"></span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F] animate-bounce [animation-delay:0.4s]"></span>
-                <span className="text-xs text-[#5C6B5E] ml-1">Sahabat sedang mengetik...</span>
+                <span className="text-xs text-[#5C6B5E] ml-1">Buddy sedang mendengarkan...</span>
               </div>
             </div>
           )}
@@ -249,7 +249,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
         {showReportOffer && (
           <div className="px-4 py-3 bg-[#F3EFED] border-t border-[#E9E4D9] flex items-center justify-between gap-2">
             <div className="text-[11px] text-[#1B4332] font-medium">
-              💡 Mau cerita ini diringkas otomatis jadi laporan resmi ke Guru BK?
+              💡 Mau cerita ini diteruskan jadi laporan resmi ke Guru BK (Bu Siska)?
             </div>
             <button
               onClick={handleConvertToReport}
@@ -277,7 +277,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSend();
             }}
-            placeholder="Ketik ceritamu dengan santai di sini..."
+            placeholder="Curhat atau ceritakan apa pun ke Buddy di sini..."
             className="flex-1 bg-[#FDFBF7] border border-[#E9E4D9] rounded-full px-4 py-2.5 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#2D6A4F] focus:bg-white transition-all text-[#1B4332]"
           />
           <button
@@ -293,7 +293,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
       {/* Bottom Option Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <p className="text-[#8C8475] text-[11px] text-center sm:text-left">
-          Sahabat didukung Gemini AI. Keputusan dan bimbingan nyata selalu dilakukan oleh Guru BK manusia.
+          Buddy didukung Gemini AI sebagai ruang curhat aman. Bimbingan nyata di sekolah didampingi oleh Guru BK.
         </p>
 
         <button
