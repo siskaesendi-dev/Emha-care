@@ -1,0 +1,7 @@
+{
+  "name": "EMHA CARE — Pelaporan Perundungan Madrasah",
+  "description": "Platform aman dan chatbot Sahabat untuk pelaporan dan penanganan perundungan di madrasah dengan triase rule-based dan pendampingan Guru BK.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
