@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, FileText, ArrowLeft, RefreshCw, Shield, AlertTriangle, User, Heart, MessageSquare } from 'lucide-react';
+import { Send, Sparkles, FileText, ArrowLeft, RefreshCw, Shield, AlertTriangle, User, Heart, MessageSquare, PhoneCall, CheckCircle2, ThumbsUp } from 'lucide-react';
 import { ChatMessage } from '../../types';
 import { generateNaturalSahabatResponse } from '../../utils/sahabatDialogue';
 
@@ -13,7 +13,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
     {
       id: 'welcome-1',
       role: 'model',
-      text: 'Hai! Aku Buddy, teman dekatmu di EMHA CARE yang siap mendengarkan ceritamu dengan hangat dan sabar. Di sini ruang aman dan rahasiamu. Ada yang lagi kamu rasakan, alami, atau ingin kamu ceritakan santai ke aku hari ini?',
+      text: 'Hai! Aku Buddy, teman dekatmu di EMHA CARE. Di sini ruang aman dan rahasia buat kamu curhat apa saja. Gimana kabarmu hari ini? Ada yang lagi kamu rasakan atau mau kamu ceritakan santai ke Aku?',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
@@ -31,11 +31,19 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const quickPrompts = [
-    'Ada teman yang suka mengejek dan panggil nama jelek...',
-    'Uang jajanku sering diminta paksa di lorong sekolah...',
-    'Fotonya diedit dan disebarkan di grup WhatsApp kelas...',
-    'Aku merasa dikucilkan dan dijauhi teman-teman...',
+  const initialQuickPrompts = [
+    'Halo Buddy, apa kabar?',
+    'Ada teman yang suka mengejek aku di kelas...',
+    'Tadi uang jajanku diminta paksa...',
+    'Aku belum mau cerita dulu...',
+    'Hari ini seru banget di madrasah!'
+  ];
+
+  const ongoingQuickActions = [
+    'Ceritaku sudah selesai, minta analisis Buddy',
+    'Aku belum mau cerita dulu',
+    'Apa saran Buddy buat masalahku?',
+    'Terima kasih banyak Buddy, sudah cukup'
   ];
 
   const handleSend = async (customText?: string) => {
@@ -54,7 +62,6 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
     setInputText('');
     setIsLoading(true);
 
-    // After at least 2 user messages, display the friendly offer to convert to a report
     const userMessageCount = newMessages.filter(m => m.role === 'user').length;
     if (userMessageCount >= 2) {
       setShowReportOffer(true);
@@ -120,6 +127,85 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
     }
   };
 
+  // Helper to render formatted chat messages with deep analysis highlights
+  const renderMessageContent = (text: string, isUser: boolean) => {
+    if (isUser) {
+      return <p className="whitespace-pre-wrap">{text}</p>;
+    }
+
+    const hasDeepAnalysis = text.includes('Yang Kamu Alami') || text.includes('Yang Kamu Rasakan') || text.includes('Rekomendasi Konsultasi ke Guru BK') || text.includes('1. Yang Kamu Alami');
+
+    // Split text by lines to render structured paragraphs and bold headings
+    const paragraphs = text.split('\n');
+
+    return (
+      <div className="space-y-2.5">
+        {hasDeepAnalysis && (
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E7F3EF] text-[#2D6A4F] text-[11px] font-bold border border-[#2D6A4F]/20 mb-1">
+            <Sparkles className="w-3 h-3" />
+            <span>Analisis & Refleksi Sahabat Buddy</span>
+          </div>
+        )}
+
+        <div className="space-y-2 text-xs sm:text-sm leading-relaxed text-[#1B4332]">
+          {paragraphs.map((para, pIdx) => {
+            const trimmed = para.trim();
+            if (!trimmed) return null;
+
+            // Highlight analysis sections
+            if (trimmed.startsWith('🔍') || trimmed.startsWith('💛') || trimmed.startsWith('🤝') || trimmed.startsWith('**1.') || trimmed.startsWith('**2.') || trimmed.startsWith('**3.')) {
+              return (
+                <div key={pIdx} className="font-bold text-[#1B4332] pt-1 text-xs sm:text-sm flex items-center gap-1.5">
+                  <span>{trimmed.replace(/\*\*/g, '')}</span>
+                </div>
+              );
+            }
+
+            return (
+              <p key={pIdx} className="whitespace-pre-wrap">
+                {trimmed.replace(/\*\*(.*?)\*\*/g, '$1')}
+              </p>
+            );
+          })}
+        </div>
+
+        {/* If deep analysis is present, display quick interactive resolution actions directly in the card */}
+        {hasDeepAnalysis && (
+          <div className="mt-3 pt-3 border-t border-[#E9E4D9] flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleConvertToReport}
+              disabled={isSummarizing}
+              className="inline-flex items-center gap-1.5 bg-[#2D6A4F] hover:bg-[#1B4332] text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>{isSummarizing ? 'Meringkas...' : 'Jadikan Laporan ke Guru BK'}</span>
+            </button>
+
+            <a
+              href="https://wa.me/6282329180233"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 bg-[#F5F2ED] hover:bg-[#E7F3EF] hover:text-[#2D6A4F] text-[#1B4332] px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#E9E4D9] transition-all"
+            >
+              <PhoneCall className="w-3.5 h-3.5 text-[#2D6A4F]" />
+              <span>WhatsApp Guru BK</span>
+            </a>
+
+            <button
+              onClick={() => handleSend('Terima kasih banyak Buddy, aku merasa lebih lega sekarang.')}
+              className="inline-flex items-center gap-1.5 bg-[#F5F2ED] hover:bg-[#E7F3EF] hover:text-[#2D6A4F] text-[#5C6B5E] px-3 py-1.5 rounded-xl text-xs font-medium border border-[#E9E4D9] transition-all"
+            >
+              <ThumbsUp className="w-3.5 h-3.5" />
+              <span>Ucapkan Terima Kasih</span>
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const userMessagesCount = messages.filter(m => m.role === 'user').length;
+
   return (
     <div className="max-w-2xl mx-auto space-y-4 pb-12">
       {/* Header Bar */}
@@ -132,16 +218,16 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
           <span>Kembali</span>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-full bg-[#2D6A4F] flex items-center justify-center text-white font-bold text-xs shadow-xs">
             <Heart className="w-4 h-4 fill-white" />
           </div>
           <div>
             <h2 className="text-xs font-bold text-[#1B4332] flex items-center gap-1.5">
-              <span>Buddy • Curhat Sahabat</span>
+              <span>Buddy (Sahabat EMHA CARE)</span>
               <span className="w-2 h-2 rounded-full bg-[#D4A373] animate-pulse"></span>
             </h2>
-            <p className="text-[10px] text-[#5C6B5E]">Teman Curhat & Ruang Aman Siswa</p>
+            <p className="text-[10px] text-[#5C6B5E]">Teman Dekat, Pendengar Hangat & Ruang Aman</p>
           </div>
         </div>
 
@@ -151,7 +237,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
               {
                 id: 'welcome-1',
                 role: 'model',
-                text: 'Hai! Aku Buddy, teman dekatmu di EMHA CARE yang siap mendengarkan ceritamu dengan hangat dan sabar. Di sini ruang aman dan rahasiamu. Ada yang lagi kamu rasakan, alami, atau ingin kamu ceritakan santai ke aku hari ini?',
+                text: 'Hai! Aku Buddy, teman dekatmu di EMHA CARE. Di sini ruang aman dan rahasia buat kamu curhat apa saja. Gimana kabarmu hari ini? Ada yang lagi kamu rasakan atau mau kamu ceritakan santai ke Aku?',
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
               }
             ]);
@@ -168,12 +254,12 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
       <div className="bg-[#F3EFED] border border-[#E9E4D9] p-3.5 rounded-2xl text-[11px] text-[#1B4332] flex items-start gap-2.5">
         <Shield className="w-4 h-4 text-[#2D6A4F] shrink-0 mt-0.5" />
         <div>
-          <strong className="text-[#2D6A4F]">Ruang Aman & Rahasia:</strong> Ceritakan apa pun yang kamu rasakan tanpa rasa takut atau dihakimi. Jika kamu ingin Guru BK membantu mendampingi di sekolah, ceritamu bisa diteruskan menjadi laporan kapan saja.
+          <strong className="text-[#2D6A4F]">Ruang Aman & Rahasia:</strong> Ceritakan apa pun yang kamu rasakan tanpa rasa takut atau dihakimi. Buddy di sini untuk mendengarkan, menemani, dan menguatkan hatimu.
         </div>
       </div>
 
       {/* Chat Messages Container */}
-      <div className="bg-white rounded-3xl border border-[#E9E4D9] shadow-sm flex flex-col h-[500px] overflow-hidden">
+      <div className="bg-white rounded-3xl border border-[#E9E4D9] shadow-sm flex flex-col h-[520px] overflow-hidden">
         {/* Messages Feed */}
         <div className="flex-1 p-4 overflow-y-auto space-y-3.5 bg-[#FDFBF7]">
           {messages.map((m) => {
@@ -181,7 +267,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
             return (
               <div
                 key={m.id}
-                className={`flex gap-2.5 max-w-[88%] ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
+                className={`flex gap-2.5 max-w-[90%] ${isUser ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
               >
                 {!isUser && (
                   <div className="w-7 h-7 rounded-full bg-[#2D6A4F] text-white flex items-center justify-center shrink-0 mt-1 shadow-xs">
@@ -202,7 +288,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
                         : 'bg-white text-[#1B4332] border border-[#E9E4D9] rounded-tl-none'
                     }`}
                   >
-                    {m.text}
+                    {renderMessageContent(m.text, isUser)}
                   </div>
                   <div className={`text-[10px] text-[#8C8475] px-1 ${isUser ? 'text-right' : 'text-left'}`}>
                     {m.timestamp}
@@ -222,7 +308,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F] animate-bounce"></span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F] animate-bounce [animation-delay:0.2s]"></span>
                 <span className="w-1.5 h-1.5 rounded-full bg-[#2D6A4F] animate-bounce [animation-delay:0.4s]"></span>
-                <span className="text-xs text-[#5C6B5E] ml-1">Buddy sedang mendengarkan...</span>
+                <span className="text-xs text-[#5C6B5E] ml-1">Buddy sedang merespon hangat...</span>
               </div>
             </div>
           )}
@@ -230,10 +316,10 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Suggestion Chips */}
-        {messages.length <= 2 && (
+        {/* Quick Suggestion Chips */}
+        {userMessagesCount === 0 && (
           <div className="px-4 py-2.5 bg-white border-t border-[#E9E4D9] overflow-x-auto flex gap-2 no-scrollbar">
-            {quickPrompts.map((prompt, idx) => (
+            {initialQuickPrompts.map((prompt, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(prompt)}
@@ -245,11 +331,27 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
           </div>
         )}
 
+        {/* Ongoing Interaction Chips when already chatting */}
+        {userMessagesCount > 0 && (
+          <div className="px-4 py-2 bg-white border-t border-[#E9E4D9] overflow-x-auto flex items-center gap-2 no-scrollbar">
+            <span className="text-[10px] font-bold text-[#8C8475] uppercase tracking-wider shrink-0">Opsi Cepat:</span>
+            {ongoingQuickActions.map((action, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSend(action)}
+                className="whitespace-nowrap text-[11px] bg-[#F5F2ED] hover:bg-[#E7F3EF] hover:text-[#2D6A4F] text-[#5C6B5E] px-3 py-1 rounded-full transition-colors border border-[#E9E4D9] font-medium"
+              >
+                {action}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Optional Action Banner to Convert to Report */}
         {showReportOffer && (
           <div className="px-4 py-3 bg-[#F3EFED] border-t border-[#E9E4D9] flex items-center justify-between gap-2">
             <div className="text-[11px] text-[#1B4332] font-medium">
-              💡 Mau cerita ini diteruskan jadi laporan resmi ke Guru BK (Bu Siska)?
+              💡 Mau cerita ini diteruskan dengan lembut ke Guru BK untuk bantuan nyata?
             </div>
             <button
               onClick={handleConvertToReport}
@@ -261,7 +363,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
               ) : (
                 <>
                   <FileText className="w-3.5 h-3.5" />
-                  <span>Jadikan Laporan</span>
+                  <span>Jadikan Laporan ke BK</span>
                 </>
               )}
             </button>
@@ -293,7 +395,7 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
       {/* Bottom Option Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
         <p className="text-[#8C8475] text-[11px] text-center sm:text-left">
-          Buddy didukung Gemini AI sebagai ruang curhat aman. Bimbingan nyata di sekolah didampingi oleh Guru BK.
+          Buddy hadir sebagai teman curhat & pendengar hangat. Pendampingan nyata di madrasah dilakukan oleh Guru BK (Ibu Siska).
         </p>
 
         <button
@@ -306,3 +408,4 @@ export const SahabatChat: React.FC<SahabatChatProps> = ({ onBack, onProceedToRep
     </div>
   );
 };
+

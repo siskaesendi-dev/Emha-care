@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp, ShieldCheck, Clock, ArrowLeft, Star, ThumbsUp, AlertTriangle, Users, MapPin, Printer, CheckCircle2, FileText, Search, Filter } from 'lucide-react';
+import { BarChart3, TrendingUp, ShieldCheck, Clock, ArrowLeft, Star, ThumbsUp, AlertTriangle, Users, MapPin, Printer, Download, FileDown, CheckCircle2, FileText, Search, Filter } from 'lucide-react';
 import { Report } from '../../types';
-import { printAnalyticsDocument } from '../../utils/printUtils';
+import { printAnalyticsDocument, downloadAnalyticsDocument } from '../../utils/printUtils';
 
 interface AnalyticsViewProps {
   reports: Report[];
@@ -12,6 +12,7 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ reports, onBack })
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [historySearch, setHistorySearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
   useEffect(() => {
     fetch('/api/analytics')
@@ -72,6 +73,11 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ reports, onBack })
     setTimeout(() => setIsPrinting(false), 1500);
   };
 
+  const handleDownload = (format: 'html' | 'doc') => {
+    downloadAnalyticsDocument(reports, undefined, format);
+    setShowDownloadMenu(false);
+  };
+
   const currentDateFormatted = new Date().toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'long',
@@ -91,14 +97,56 @@ export const AnalyticsView: React.FC<AnalyticsViewProps> = ({ reports, onBack })
           <span>Kembali ke Daftar Kasus</span>
         </button>
 
-        <button
-          onClick={handlePrint}
-          disabled={isPrinting}
-          className="flex items-center gap-2 text-xs font-bold text-white bg-[#2D6A4F] hover:bg-[#1B4332] px-4 py-2.5 rounded-xl shadow-xs transition-all cursor-pointer"
-        >
-          <Printer className="w-4 h-4 text-[#D4A373]" />
-          <span>{isPrinting ? 'Menyiapkan Printer...' : 'Cetak Rekap & Riwayat Kasus (PDF)'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Download Dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+              className="flex items-center gap-1.5 text-xs font-bold text-[#1B4332] bg-[#F5F2ED] hover:bg-[#E9E4D9] border border-[#E9E4D9] px-3.5 py-2.5 rounded-xl shadow-xs transition-all cursor-pointer"
+              title="Unduh Rekapitulasi Kasus ke Perangkat (HP / Laptop)"
+            >
+              <Download className="w-4 h-4 text-[#2D6A4F]" />
+              <span>Unduh Rekap</span>
+            </button>
+
+            {showDownloadMenu && (
+              <div className="absolute right-0 mt-1.5 w-52 bg-white rounded-2xl shadow-xl border border-[#E9E4D9] p-2 z-20 space-y-1">
+                <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8C8475]">
+                  Simpan ke Perangkat:
+                </div>
+                <button
+                  onClick={() => handleDownload('html')}
+                  className="w-full text-left px-2.5 py-2 rounded-xl text-xs font-semibold text-[#1B4332] hover:bg-[#E7F3EF] flex items-center gap-2 transition-colors cursor-pointer"
+                >
+                  <FileDown className="w-4 h-4 text-[#2D6A4F]" />
+                  <div>
+                    <div className="font-bold">Unduh Dokumen (.HTML)</div>
+                    <div className="text-[10px] text-[#5C6B5E]">Bisa dibuka offline di HP/PC</div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => handleDownload('doc')}
+                  className="w-full text-left px-2.5 py-2 rounded-xl text-xs font-semibold text-[#1B4332] hover:bg-[#E7F3EF] flex items-center gap-2 transition-colors cursor-pointer"
+                >
+                  <FileText className="w-4 h-4 text-[#D4A373]" />
+                  <div>
+                    <div className="font-bold">Unduh Format Word (.DOC)</div>
+                    <div className="text-[10px] text-[#5C6B5E]">Bisa diedit di Word / Docs</div>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handlePrint}
+            disabled={isPrinting}
+            className="flex items-center gap-2 text-xs font-bold text-white bg-[#2D6A4F] hover:bg-[#1B4332] px-4 py-2.5 rounded-xl shadow-xs transition-all cursor-pointer"
+          >
+            <Printer className="w-4 h-4 text-[#D4A373]" />
+            <span>{isPrinting ? 'Menyiapkan Printer...' : 'Cetak / Simpan PDF'}</span>
+          </button>
+        </div>
       </div>
 
       {/* ========================================================================= */}

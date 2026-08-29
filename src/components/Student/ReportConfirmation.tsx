@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Copy, Check, Search, Home, ShieldCheck, Heart, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Copy, Check, Search, Home, ShieldCheck, Heart, AlertCircle, Download, FileText } from 'lucide-react';
+import { downloadStudentReportSlip } from '../../utils/printUtils';
 
 interface ReportConfirmationProps {
   reportCode: string;
@@ -18,6 +19,15 @@ export const ReportConfirmation: React.FC<ReportConfirmationProps> = ({
     navigator.clipboard.writeText(reportCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleDownloadSlip = () => {
+    downloadStudentReportSlip({
+      reportCode,
+      category: 'Laporan Siswa',
+      createdAt: new Date().toISOString(),
+      status: 'TERKIRIM'
+    });
   };
 
   return (
@@ -45,22 +55,33 @@ export const ReportConfirmation: React.FC<ReportConfirmationProps> = ({
           </span>
         </div>
 
-        <button
-          onClick={handleCopy}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#2D6A4F] hover:bg-[#23533e] text-xs font-semibold transition-all border border-white/20 text-white shadow-xs"
-        >
-          {copied ? (
-            <>
-              <Check className="w-4 h-4 text-[#D4A373]" />
-              <span>Kode Berhasil Disalin!</span>
-            </>
-          ) : (
-            <>
-              <Copy className="w-4 h-4 text-[#D4A373]" />
-              <span>Salin Kode Laporan</span>
-            </>
-          )}
-        </button>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <button
+            onClick={handleCopy}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#2D6A4F] hover:bg-[#23533e] text-xs font-semibold transition-all border border-white/20 text-white shadow-xs cursor-pointer"
+          >
+            {copied ? (
+              <>
+                <Check className="w-4 h-4 text-[#D4A373]" />
+                <span>Kode Berhasil Disalin!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-4 h-4 text-[#D4A373]" />
+                <span>Salin Kode Laporan</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={handleDownloadSlip}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FDFBF7] hover:bg-white text-[#1B4332] text-xs font-bold transition-all shadow-xs cursor-pointer"
+            title="Unduh dan simpan bukti kode laporan di HP/Laptop"
+          >
+            <Download className="w-4 h-4 text-[#2D6A4F]" />
+            <span>Unduh Bukti Laporan</span>
+          </button>
+        </div>
 
         <p className="text-[11px] text-[#E7F3EF]/80 max-w-sm mx-auto">
           ⚠️ <strong>Simpan kode ini baik-baik!</strong> Kode ini adalah satu-satunya cara untuk mengecek perkembangan penanganan tanpa membuka identitasmu.

@@ -6,7 +6,7 @@ export const INITIAL_COUNSELORS: Counselor[] = [
     id: 'c-1',
     name: 'Siska Noviana Dewi, M.Sc.',
     title: 'Guru Bimbingan Konseling (Guru BK)',
-    role: 'Guru Bimbingan Konseling',
+    role: 'Koordinator Bimbingan Konseling',
     gradeAssignment: 'Koordinator BK & Semua Jenjang',
     assignedGrade: 'Koordinator BK & Semua Jenjang',
     phone: '082329180233',
@@ -16,6 +16,21 @@ export const INITIAL_COUNSELORS: Counselor[] = [
     email: 'siska.noviana@madrasah.sch.id',
     avatarUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
     isEmergencyContact: true,
+  },
+  {
+    id: 'c-2',
+    name: 'Ahmad Rosyadi, S.Pd.',
+    title: 'Guru Bimbingan Konseling (Guru BK)',
+    role: 'Guru Bimbingan Konseling',
+    gradeAssignment: 'Guru BK & Pendamping Siswa',
+    assignedGrade: 'Guru BK & Pendamping Siswa',
+    phone: '085226123456',
+    whatsapp: '085226123456',
+    schedule: 'Senin - Jumat (07.30 - 15.30 WIB)',
+    dutyHours: 'Senin - Jumat (07.30 - 15.30 WIB)',
+    email: 'ahmad.rosyadi@madrasah.sch.id',
+    avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+    isEmergencyContact: false,
   }
 ];
 

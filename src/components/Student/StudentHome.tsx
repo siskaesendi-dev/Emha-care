@@ -136,7 +136,7 @@ export const StudentHome: React.FC<StudentHomeProps> = ({
                 Curhat Sahabat (Buddy)
               </h3>
               <p className="text-xs text-[#5C6B5E] leading-relaxed">
-                Ceritakan unek-unek atau keresahanmu ke <strong>Buddy</strong>, teman dekat yang hangat & empatik sebagai ruang amanmu.
+                Ceritakan unek-unek atau keseharianmu ke <strong>Buddy</strong>, teman dekat yang hangat, berempati, & siap mendengarkan di ruang amanmu.
               </p>
             </div>
 

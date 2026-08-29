@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShieldCheck, CheckCircle2, Clock, MessageSquare, Send, ArrowLeft, Star, ThumbsUp, HelpCircle, AlertCircle } from 'lucide-react';
+import { Search, ShieldCheck, CheckCircle2, Clock, MessageSquare, Send, ArrowLeft, Star, ThumbsUp, HelpCircle, AlertCircle, Download } from 'lucide-react';
 import { ReportStatus } from '../../types';
+import { downloadStudentReportSlip } from '../../utils/printUtils';
 
 interface TrackReportProps {
   initialCode?: string;
@@ -214,17 +215,27 @@ export const TrackReport: React.FC<TrackReportProps> = ({ initialCode = '', onBa
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#8C8475]">Kode Laporan</span>
                 <div className="font-mono text-xl font-extrabold text-[#1B4332]">{report.reportCode}</div>
               </div>
-              <div className="text-right">
-                <span className="text-[10px] text-[#8C8475]">Tanggal Pengiriman</span>
-                <div className="text-xs font-medium text-[#5C6B5E]">
-                  {new Date(report.createdAt).toLocaleDateString('id-ID', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
+              <div className="flex items-center gap-3">
+                <div className="text-right hidden sm:block">
+                  <span className="text-[10px] text-[#8C8475]">Tanggal Pengiriman</span>
+                  <div className="text-xs font-medium text-[#5C6B5E]">
+                    {new Date(report.createdAt).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </div>
                 </div>
+                <button
+                  onClick={() => downloadStudentReportSlip(report)}
+                  className="px-3 py-1.5 rounded-xl bg-[#E7F3EF] hover:bg-[#2D6A4F] text-[#2D6A4F] hover:text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#2D6A4F]/20 shadow-2xs"
+                  title="Unduh & simpan bukti laporan ke HP/Laptop"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Unduh Bukti</span>
+                </button>
               </div>
             </div>
 

@@ -66,7 +66,7 @@ app.post('/api/chat', async (req, res) => {
       lowerLatest.includes('sayat tangan')
     ) {
       return res.json({
-        text: 'Aku sangat peduli sama kamu dan kamu itu berharga banget. Tolong, ini penting sekali: bicaralah ke Guru BK (Bu Siska) atau orang dewasa terpercaya sekarang juga ya. Kamu tidak sendirian dan kami di sini siap membantumu.'
+        text: 'Aku sangat peduli sama kamu dan kamu itu berharga banget. Tolong, ini penting sekali: bicaralah ke Guru BK atau orang dewasa terpercaya sekarang juga ya. Kamu tidak sendirian dan kami di sini siap membantumu.'
       });
     }
 
@@ -88,7 +88,7 @@ app.post('/api/chat', async (req, res) => {
       config: {
         systemInstruction: SAHABAT_SYSTEM_INSTRUCTION,
         temperature: 0.7,
-        maxOutputTokens: 250,
+        maxOutputTokens: 800,
       }
     });
 

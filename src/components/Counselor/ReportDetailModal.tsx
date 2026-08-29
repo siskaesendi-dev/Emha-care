@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { X, ShieldAlert, CheckCircle2, Clock, AlertTriangle, MessageSquare, PhoneCall, MessageCircle, UserCheck, FileText, Send, Printer, User, Save, Calendar, CheckSquare, Square, Shield, Trash2, Check } from 'lucide-react';
+import { X, ShieldAlert, CheckCircle2, Clock, AlertTriangle, MessageSquare, PhoneCall, MessageCircle, UserCheck, FileText, Send, Printer, Download, FileDown, User, Save, Calendar, CheckSquare, Square, Shield, Trash2, Check } from 'lucide-react';
 import { Counselor, Report, ReportStatus } from '../../types';
-import { printCaseDocument } from '../../utils/printUtils';
+import { printCaseDocument, downloadCaseDocument } from '../../utils/printUtils';
 
 interface ReportDetailModalProps {
   report: Report;
@@ -130,11 +130,17 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
   };
 
   const [isPrinting, setIsPrinting] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
 
   const printReport = () => {
     setIsPrinting(true);
     printCaseDocument(currentReport, counselor.name);
     setTimeout(() => setIsPrinting(false), 1500);
+  };
+
+  const handleDownload = (format: 'html' | 'doc') => {
+    downloadCaseDocument(currentReport, counselor.name, format);
+    setShowDownloadMenu(false);
   };
 
   return (
@@ -164,6 +170,48 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Download Dropdown */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                className="px-3 py-1.5 rounded-xl bg-[#F5F2ED] hover:bg-[#E9E4D9] text-[#1B4332] font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#E9E4D9] shadow-2xs"
+                title="Unduh Berkas Kasus untuk Disimpan di Perangkat (HP / Laptop)"
+              >
+                <Download className="w-3.5 h-3.5 text-[#2D6A4F]" />
+                <span className="hidden sm:inline">Unduh Berkas</span>
+              </button>
+
+              {showDownloadMenu && (
+                <div className="absolute right-0 mt-1.5 w-52 bg-white rounded-2xl shadow-xl border border-[#E9E4D9] p-2 z-20 space-y-1">
+                  <div className="px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-[#8C8475]">
+                    Simpan ke Perangkat:
+                  </div>
+                  <button
+                    onClick={() => handleDownload('html')}
+                    className="w-full text-left px-2.5 py-2 rounded-xl text-xs font-semibold text-[#1B4332] hover:bg-[#E7F3EF] flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <FileDown className="w-4 h-4 text-[#2D6A4F]" />
+                    <div>
+                      <div className="font-bold">Unduh Dokumen Offline (.HTML)</div>
+                      <div className="text-[10px] text-[#5C6B5E]">Bisa dibuka offline di HP/PC</div>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => handleDownload('doc')}
+                    className="w-full text-left px-2.5 py-2 rounded-xl text-xs font-semibold text-[#1B4332] hover:bg-[#E7F3EF] flex items-center gap-2 transition-colors cursor-pointer"
+                  >
+                    <FileText className="w-4 h-4 text-[#D4A373]" />
+                    <div>
+                      <div className="font-bold">Unduh Format Word (.DOC)</div>
+                      <div className="text-[10px] text-[#5C6B5E]">Bisa diedit di Word / Docs</div>
+                    </div>
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Print / PDF Button */}
             <button
               onClick={printReport}
               disabled={isPrinting}
@@ -171,7 +219,7 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
               title="Cetak Berkas Kasus ke Printer / Simpan PDF"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{isPrinting ? 'Mempersiapkan...' : 'Cetak Kasus (PDF)'}</span>
+              <span className="hidden sm:inline">{isPrinting ? 'Mempersiapkan...' : 'Cetak / PDF'}</span>
             </button>
 
             <button
