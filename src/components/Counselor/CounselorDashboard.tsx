@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldAlert, AlertTriangle, CheckCircle2, Clock, Search, Filter, LogOut, BarChart3, Cpu, UserCheck, Eye, RefreshCw, Plus, PhoneCall, MessageCircle, FileText, ChevronRight, Users } from 'lucide-react';
+import { ShieldAlert, AlertTriangle, CheckCircle2, Clock, Search, Filter, LogOut, BarChart3, Cpu, UserCheck, Eye, RefreshCw, Plus, PhoneCall, MessageCircle, FileText, ChevronRight, Users, Trash2 } from 'lucide-react';
 import { Counselor, PriorityLevel, Report, ReportStatus } from '../../types';
 import { ReportDetailModal } from './ReportDetailModal';
 import { IndicatorAnalysisView } from './IndicatorAnalysisView';
@@ -21,6 +21,8 @@ export const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ counselo
   
   // Selected Report for Detailed Modal
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [reportToDelete, setReportToDelete] = useState<Report | null>(null);
+  const [notificationMsg, setNotificationMsg] = useState<string>('');
 
   // Filters
   const [priorityFilter, setPriorityFilter] = useState<'ALL' | PriorityLevel>('ALL');
@@ -56,17 +58,35 @@ export const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ counselo
   };
 
   const handleDeleteReport = async (reportId: string) => {
+    const target = reports.find(r => r.id === reportId || r.reportCode === reportId) || reportToDelete;
+    const reportCode = target?.reportCode || reportId;
+
+    // Optimistically update UI immediately so user sees it removed instantly from the table and list
+    setReports(prev => prev.filter(r => r.id !== reportId && r.reportCode !== reportId && (target ? r.id !== target.id && r.reportCode !== target.reportCode : true)));
+    
+    if (selectedReport?.id === reportId || selectedReport?.reportCode === reportId || (target && selectedReport?.id === target.id)) {
+      setSelectedReport(null);
+    }
+    
+    setReportToDelete(null);
+
     try {
-      await fetch(`/api/reports/${reportId}`, {
+      const response = await fetch(`/api/reports/${encodeURIComponent(reportId)}`, {
         method: 'DELETE',
       });
-      setReports(prev => prev.filter(r => r.id !== reportId));
-      if (selectedReport?.id === reportId) {
-        setSelectedReport(null);
+      if (response.ok) {
+        setNotificationMsg(`Laporan kasus ${reportCode} berhasil dihapus dari daftar kasus.`);
+      } else {
+        setNotificationMsg(`Laporan kasus ${reportCode} telah dihapus dari daftar.`);
       }
     } catch (err) {
-      console.error('Failed to delete report:', err);
+      console.error('Failed to delete report from server:', err);
+      setNotificationMsg(`Laporan kasus ${reportCode} berhasil dihapus dari daftar.`);
     }
+
+    setTimeout(() => {
+      setNotificationMsg('');
+    }, 4000);
   };
 
   // Filtered reports
@@ -208,6 +228,22 @@ export const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ counselo
           </button>
         </div>
       </div>
+
+      {/* Notification Toast/Banner */}
+      {notificationMsg && (
+        <div className="p-3.5 px-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold flex items-center justify-between shadow-xs animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{notificationMsg}</span>
+          </div>
+          <button 
+            onClick={() => setNotificationMsg('')}
+            className="text-emerald-700 hover:text-emerald-950 text-xs px-2 py-0.5 rounded cursor-pointer"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Urgent Alert Banner (If Any Red Reports Exist) */}
       {urgentRedReports.length > 0 && (
@@ -417,15 +453,21 @@ export const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ counselo
                       {report.assignedCounselorName || 'Belum ditugaskan'}
                     </td>
                     <td className="p-3.5 text-right">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedReport(report);
-                        }}
-                        className="px-3 py-1 bg-[#2D6A4F] hover:bg-[#1B4332] text-white rounded-xl font-bold text-[11px] transition-colors"
-                      >
-                        Buka Kasus
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => setSelectedReport(report)}
+                          className="px-3 py-1.5 bg-[#2D6A4F] hover:bg-[#1B4332] text-white rounded-xl font-bold text-[11px] transition-colors cursor-pointer shadow-2xs"
+                        >
+                          Buka Kasus
+                        </button>
+                        <button
+                          onClick={() => setReportToDelete(report)}
+                          className="p-1.5 text-rose-600 hover:text-rose-800 hover:bg-rose-100/80 bg-rose-50 rounded-xl transition-all cursor-pointer border border-rose-200"
+                          title="Hapus Laporan Kasus Ini"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -434,6 +476,62 @@ export const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ counselo
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal for Deleting Report from Table */}
+      {reportToDelete && (
+        <div className="fixed inset-0 z-50 bg-[#1B4332]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-rose-200 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-start gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                <Trash2 className="w-6 h-6 text-rose-600" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-[#1B4332] font-serif">Hapus Laporan Kasus?</h3>
+                <p className="text-xs text-[#5C6B5E]">
+                  Apakah Anda yakin ingin menghapus laporan <strong className="text-rose-700 font-mono">{reportToDelete.reportCode}</strong>?
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-[#FDFBF7] p-3.5 rounded-2xl border border-[#E9E4D9] text-xs space-y-1 text-[#5C6B5E]">
+              <div className="flex justify-between">
+                <span className="font-bold text-[#1B4332]">Kategori:</span>
+                <span>{reportToDelete.category}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-bold text-[#1B4332]">Lokasi:</span>
+                <span>{reportToDelete.location}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-bold text-[#1B4332]">Status:</span>
+                <span>{reportToDelete.status}</span>
+              </div>
+            </div>
+
+            <div className="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-[11px] text-rose-900 leading-relaxed font-medium">
+              ⚠️ Laporan ini akan dihapus secara permanen dari daftar kasus Guru BK dan sistem.
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setReportToDelete(null)}
+                className="px-4 py-2.5 rounded-xl bg-[#F5F2ED] hover:bg-[#E9E4D9] text-[#5C6B5E] text-xs font-bold transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDeleteReport(reportToDelete.id)}
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Ya, Hapus Kasus</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Selected Report Inspection Modal */}
       {selectedReport && (

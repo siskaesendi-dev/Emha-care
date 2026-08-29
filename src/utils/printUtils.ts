@@ -1,4 +1,6 @@
 import { Report } from '../types';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export const generateCaseDocumentHtml = (report: Report, counselorName?: string, includeOfflineButtons = false): string => {
   const currentDate = new Date().toLocaleDateString('id-ID', {
@@ -622,15 +624,17 @@ export const downloadAnalyticsDocument = (
 };
 
 /**
- * Download Student Confirmation / Tracking Slip
+ * Download Student Confirmation / Tracking Slip directly as PDF (or fallback)
  */
-export const downloadStudentReportSlip = (
-  reportOrCode: string | { reportCode: string; category?: string; createdAt?: string; status?: string },
+export const downloadStudentReportSlip = async (
+  reportOrCode: string | { reportCode: string; category?: string; createdAt?: string; status?: string; location?: string; frequency?: string },
   categoryParam?: string
 ) => {
   const code = typeof reportOrCode === 'string' ? reportOrCode : reportOrCode.reportCode;
-  const category = typeof reportOrCode === 'string' ? categoryParam : (reportOrCode.category || categoryParam);
-  const status = typeof reportOrCode === 'object' && reportOrCode.status ? reportOrCode.status : undefined;
+  const category = typeof reportOrCode === 'string' ? categoryParam : (reportOrCode.category || categoryParam || 'Laporan Siswa');
+  const status = typeof reportOrCode === 'object' && reportOrCode.status ? reportOrCode.status : 'TERKIRIM';
+  const location = typeof reportOrCode === 'object' && reportOrCode.location ? reportOrCode.location : '-';
+  const frequency = typeof reportOrCode === 'object' && reportOrCode.frequency ? reportOrCode.frequency : '-';
 
   const currentDate = new Date().toLocaleDateString('id-ID', {
     day: 'numeric',
@@ -640,7 +644,130 @@ export const downloadStudentReportSlip = (
     minute: '2-digit'
   });
 
-  const htmlContent = `<!DOCTYPE html>
+  try {
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a5',
+    });
+
+    // Outer Background / Border
+    pdf.setFillColor(253, 251, 247); // #FDFBF7
+    pdf.rect(0, 0, 148, 210, 'F');
+
+    // Header Background
+    pdf.setFillColor(27, 67, 50); // #1B4332
+    pdf.roundedRect(8, 8, 132, 28, 4, 4, 'F');
+
+    // Header Text
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(14);
+    pdf.setTextColor(253, 251, 247);
+    pdf.text('EMHA CARE - TANDA TERIMA LAPORAN', 74, 18, { align: 'center' });
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(9);
+    pdf.setTextColor(212, 163, 115); // #D4A373
+    pdf.text("MTs Matholi'ul Huda Troso Pecangaan Jepara", 74, 25, { align: 'center' });
+    pdf.text('Layanan Pengaduan & Perlindungan Siswa Anonim', 74, 30, { align: 'center' });
+
+    // Tracking Code Box
+    pdf.setFillColor(245, 242, 237); // #F5F2ED
+    pdf.setDrawColor(233, 228, 217);
+    pdf.roundedRect(8, 40, 132, 28, 4, 4, 'FD');
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(9);
+    pdf.setTextColor(92, 107, 94);
+    pdf.text('KODE PELACAKAN ANONIM:', 74, 48, { align: 'center' });
+
+    pdf.setFont('courier', 'bold');
+    pdf.setFontSize(22);
+    pdf.setTextColor(27, 67, 50);
+    pdf.text(code, 74, 60, { align: 'center' });
+
+    // Details Box
+    pdf.setFillColor(255, 255, 255);
+    pdf.setDrawColor(233, 228, 217);
+    pdf.roundedRect(8, 72, 132, 60, 4, 4, 'FD');
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(27, 67, 50);
+    pdf.text('DETAIL LAPORAN SISWA', 14, 82);
+
+    pdf.setDrawColor(233, 228, 217);
+    pdf.line(14, 85, 134, 85);
+
+    pdf.setFontSize(8.5);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(122, 106, 83);
+    pdf.text('Waktu Submit:', 14, 93);
+    pdf.text('Kategori Kejadian:', 14, 101);
+    pdf.text('Lokasi Kejadian:', 14, 109);
+    pdf.text('Frekuensi Kejadian:', 14, 117);
+    pdf.text('Status Terkini:', 14, 125);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setTextColor(27, 67, 50);
+    pdf.text(`${currentDate} WIB`, 52, 93);
+    pdf.text(String(category), 52, 101);
+    pdf.text(String(location), 52, 109);
+    pdf.text(String(frequency), 52, 117);
+    
+    // Status text in green bold
+    pdf.setFont('helvetica', 'bold');
+    pdf.setTextColor(45, 106, 79);
+    pdf.text(String(status), 52, 125);
+
+    // Guidance Card
+    pdf.setFillColor(231, 243, 239); // #E7F3EF
+    pdf.setDrawColor(45, 106, 79);
+    pdf.roundedRect(8, 136, 132, 38, 4, 4, 'FD');
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(9);
+    pdf.setTextColor(27, 67, 50);
+    pdf.text('PETUNJUK PENGGUNAAN & KEAMANAN:', 14, 145);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(8);
+    pdf.setTextColor(45, 106, 79);
+    const splitNote1 = pdf.splitTextToSize(
+      '1. Simpan file PDF atau salin kode ini dengan aman. Identitasmu tetap 100% rahasia.',
+      120
+    );
+    pdf.text(splitNote1, 14, 152);
+
+    const splitNote2 = pdf.splitTextToSize(
+      '2. Masukkan kode di atas pada menu "Lacak Laporan" di EMHA CARE untuk melihat tindakan Guru BK serta bertukar pesan secara anonim.',
+      120
+    );
+    pdf.text(splitNote2, 14, 160);
+
+    const splitNote3 = pdf.splitTextToSize(
+      '3. Jika butuh perlindungan darurat, segera temui Guru BK di Ruang BK MTs Matholi\'ul Huda Troso.',
+      120
+    );
+    pdf.text(splitNote3, 14, 168);
+
+    // Footer
+    pdf.setFont('helvetica', 'italic');
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(140, 132, 117);
+    pdf.text(
+      `Dokumen ini dicetak otomatis dari Sistem EMHA CARE MTs Matholi'ul Huda Troso pada ${currentDate}`,
+      74,
+      198,
+      { align: 'center' }
+    );
+
+    // Save as PDF file
+    pdf.save(`Bukti-Laporan-${code}.pdf`);
+  } catch (error) {
+    console.error('Failed to generate PDF with jsPDF, triggering html fallback:', error);
+    // HTML fallback if PDF generation fails
+    const htmlContent = `<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="utf-8"/>
@@ -674,14 +801,15 @@ export const downloadStudentReportSlip = (
 </body>
 </html>`;
 
-  const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `Bukti-Laporan-${code}.html`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Bukti-Laporan-${code}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 };
 

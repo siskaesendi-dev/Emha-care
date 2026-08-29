@@ -76,10 +76,10 @@ export const ReportConfirmation: React.FC<ReportConfirmationProps> = ({
           <button
             onClick={handleDownloadSlip}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FDFBF7] hover:bg-white text-[#1B4332] text-xs font-bold transition-all shadow-xs cursor-pointer"
-            title="Unduh dan simpan bukti kode laporan di HP/Laptop"
+            title="Unduh dan simpan bukti kode laporan dalam format PDF di HP/Laptop"
           >
             <Download className="w-4 h-4 text-[#2D6A4F]" />
-            <span>Unduh Bukti Laporan</span>
+            <span>Unduh Bukti (PDF)</span>
           </button>
         </div>
 

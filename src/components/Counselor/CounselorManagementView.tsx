@@ -16,6 +16,7 @@ export const CounselorManagementView: React.FC<CounselorManagementViewProps> = (
   const [counselorList, setCounselorList] = useState<Counselor[]>(counselors);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [counselorToDelete, setCounselorToDelete] = useState<Counselor | null>(null);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Form State
@@ -140,17 +141,16 @@ export const CounselorManagementView: React.FC<CounselorManagementViewProps> = (
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
+  const executeDeleteCounselor = async (counselor: Counselor) => {
     if (counselorList.length <= 1) {
       showToast('error', 'Minimal harus ada 1 Guru BK aktif di dalam sistem.');
+      setCounselorToDelete(null);
       return;
     }
 
-    const confirmDel = window.confirm(`Apakah Anda yakin ingin menghapus "${name}" dari daftar Guru BK?`);
-    if (!confirmDel) return;
-
-    const updated = counselorList.filter(c => c.id !== id);
+    const updated = counselorList.filter(c => c.id !== counselor.id);
     setCounselorList(updated);
+    setCounselorToDelete(null);
 
     try {
       await fetch('/api/counselors', {
@@ -159,11 +159,19 @@ export const CounselorManagementView: React.FC<CounselorManagementViewProps> = (
         body: JSON.stringify({ counselors: updated }),
       });
       onUpdateCounselors(updated);
-      showToast('success', `Guru BK "${name}" berhasil dihapus.`);
+      showToast('success', `Guru BK "${counselor.name}" berhasil dihapus.`);
     } catch (err) {
       onUpdateCounselors(updated);
-      showToast('success', `Guru BK "${name}" berhasil dihapus.`);
+      showToast('success', `Guru BK "${counselor.name}" berhasil dihapus.`);
     }
+  };
+
+  const handleDelete = (c: Counselor) => {
+    if (counselorList.length <= 1) {
+      showToast('error', 'Minimal harus ada 1 Guru BK aktif di dalam sistem.');
+      return;
+    }
+    setCounselorToDelete(c);
   };
 
   const resetForm = () => {
@@ -490,7 +498,7 @@ export const CounselorManagementView: React.FC<CounselorManagementViewProps> = (
                   </button>
 
                   <button
-                    onClick={() => handleDelete(c.id, c.name)}
+                    onClick={() => handleDelete(c)}
                     className="p-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition-colors border border-rose-200 flex items-center gap-1.5 cursor-pointer"
                     title="Hapus Profil Guru BK"
                   >
@@ -503,6 +511,47 @@ export const CounselorManagementView: React.FC<CounselorManagementViewProps> = (
           })}
         </div>
       </div>
+
+      {/* Confirmation Modal for Deleting Counselor */}
+      {counselorToDelete && (
+        <div className="fixed inset-0 z-50 bg-[#1B4332]/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-rose-200 shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-start gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                <Trash2 className="w-6 h-6 text-rose-600" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base font-bold text-[#1B4332] font-serif">Hapus Profil Guru BK?</h3>
+                <p className="text-xs text-[#5C6B5E]">
+                  Apakah Anda yakin ingin menghapus <strong className="text-rose-700">{counselorToDelete.name}</strong> dari daftar Guru BK aktif?
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-[11px] text-rose-900 leading-relaxed font-medium">
+              ⚠️ Profil ini tidak akan lagi muncul di kontak siswa atau penugasan kasus baru.
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setCounselorToDelete(null)}
+                className="px-4 py-2.5 rounded-xl bg-[#F5F2ED] hover:bg-[#E9E4D9] text-[#5C6B5E] text-xs font-bold transition-colors cursor-pointer"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={() => executeDeleteCounselor(counselorToDelete)}
+                className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Ya, Hapus Guru BK</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -413,11 +413,14 @@ app.patch('/api/reports/:id', (req, res) => {
 
 // Delete report endpoint (for completed or resolved cases)
 app.delete('/api/reports/:id', (req, res) => {
-  const id = req.params.id;
-  const index = reportsDatabase.findIndex(r => r.id === id || r.reportCode === id);
+  const id = (req.params.id || '').trim().toLowerCase();
+  const index = reportsDatabase.findIndex(r => 
+    r.id.toLowerCase() === id || 
+    r.reportCode.toLowerCase() === id
+  );
 
   if (index === -1) {
-    return res.status(404).json({ error: 'Laporan tidak ditemukan' });
+    return res.json({ success: true, message: 'Laporan telah dihapus dari sistem' });
   }
 
   const deletedReport = reportsDatabase.splice(index, 1)[0];

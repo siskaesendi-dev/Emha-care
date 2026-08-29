@@ -230,11 +230,11 @@ export const TrackReport: React.FC<TrackReportProps> = ({ initialCode = '', onBa
                 </div>
                 <button
                   onClick={() => downloadStudentReportSlip(report)}
-                  className="px-3 py-1.5 rounded-xl bg-[#E7F3EF] hover:bg-[#2D6A4F] text-[#2D6A4F] hover:text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#2D6A4F]/20 shadow-2xs"
-                  title="Unduh & simpan bukti laporan ke HP/Laptop"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#E7F3EF] hover:bg-[#2D6A4F] text-[#2D6A4F] hover:text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#2D6A4F]/20 shadow-2xs"
+                  title="Unduh & simpan bukti laporan dalam bentuk file PDF ke perangkat"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Unduh Bukti</span>
+                  <span>Unduh Bukti (PDF)</span>
                 </button>
               </div>
             </div>

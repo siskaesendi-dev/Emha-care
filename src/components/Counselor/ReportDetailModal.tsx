@@ -83,23 +83,21 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
     }
   };
 
-  const handleDelete = async () => {
-    const confirmDelete = window.confirm(
-      `Apakah Anda yakin ingin menghapus data kasus ${currentReport.reportCode}?\n\nTindakan ini permanen dan akan menghapus laporan dari daftar.`
-    );
-    if (!confirmDelete) return;
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const confirmAndExecuteDelete = async () => {
     setIsDeleting(true);
     try {
       if (onDeleteReport) {
         await onDeleteReport(currentReport.id);
       } else {
-        await fetch(`/api/reports/${currentReport.id}`, { method: 'DELETE' });
+        await fetch(`/api/reports/${encodeURIComponent(currentReport.id)}`, { method: 'DELETE' });
       }
       onClose();
     } catch (err) {
       console.error('Failed to delete report:', err);
       setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -522,11 +520,11 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
         <div className="p-4 border-t border-[#E9E4D9] bg-white flex flex-wrap items-center justify-between gap-3 shrink-0">
           <div className="flex items-center gap-2">
             <button
-              onClick={handleDelete}
+              onClick={() => setShowDeleteConfirm(true)}
               disabled={isDeleting}
-              className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold border border-rose-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 text-xs font-bold border border-rose-200 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-3.5 h-3.5 text-rose-600" />
               <span>{isDeleting ? 'Menghapus...' : 'Hapus Kasus Ini'}</span>
             </button>
           </div>
@@ -549,6 +547,49 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
             </button>
           </div>
         </div>
+
+        {/* In-Modal Delete Confirmation Overlay */}
+        {showDeleteConfirm && (
+          <div className="absolute inset-0 bg-[#1B4332]/70 backdrop-blur-xs flex items-center justify-center p-4 z-60 animate-in fade-in">
+            <div className="bg-white rounded-3xl p-6 max-w-md w-full border border-rose-200 shadow-2xl space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
+                  <Trash2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#1B4332] font-serif">Hapus Berkas Kasus?</h3>
+                  <p className="text-xs text-[#5C6B5E] mt-1">
+                    Apakah Anda yakin ingin menghapus laporan kasus <strong className="text-rose-700 font-mono">{currentReport.reportCode}</strong> ({currentReport.category})?
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-[11px] text-rose-900 leading-relaxed">
+                ⚠️ Laporan ini akan dihapus secara permanen dari daftar kasus Guru BK dan sistem pelaporan.
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  className="px-4 py-2 rounded-xl bg-[#F5F2ED] hover:bg-[#E9E4D9] text-[#5C6B5E] text-xs font-bold transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmAndExecuteDelete}
+                  disabled={isDeleting}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>{isDeleting ? 'Menghapus...' : 'Ya, Hapus Kasus'}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
