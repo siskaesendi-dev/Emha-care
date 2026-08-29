@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Navbar } from './components/Navbar';
 import { LandingHero } from './components/Student/LandingHero';
 import { StudentHome } from './components/Student/StudentHome';
@@ -16,25 +16,61 @@ import { CounselorContact } from './components/Student/CounselorContact';
 import { CounselorLogin } from './components/Counselor/CounselorLogin';
 import { CounselorDashboard } from './components/Counselor/CounselorDashboard';
 import { Counselor } from './types';
+import { INITIAL_COUNSELORS } from './data/initialData';
 import { EmhaCareLogo } from './components/EmhaCareLogo';
 
 export default function App() {
   const [currentPortal, setCurrentPortal] = useState<'landing' | 'siswa' | 'counselor'>('landing');
   const [activeTab, setActiveTab] = useState<string>('landing');
   const [loggedCounselor, setLoggedCounselor] = useState<Counselor | null>(null);
+  const [counselors, setCounselors] = useState<Counselor[]>(INITIAL_COUNSELORS);
   
   // Cross-view state transfer
   const [prefillDescription, setPrefillDescription] = useState<string>('');
   const [submittedReportCode, setSubmittedReportCode] = useState<string>('');
   const [trackTargetCode, setTrackTargetCode] = useState<string>('');
 
+  const fetchCounselors = useCallback(async () => {
+    try {
+      const res = await fetch('/api/counselors');
+      const data = await res.json();
+      if (data.counselors && Array.isArray(data.counselors) && data.counselors.length > 0) {
+        setCounselors(data.counselors);
+      }
+    } catch (err) {
+      console.error('Failed to fetch counselors:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCounselors();
+  }, [fetchCounselors]);
+
+  const handleUpdateCounselors = (updatedList: Counselor[]) => {
+    setCounselors(updatedList);
+    // If the currently logged in counselor was modified or deleted, update loggedCounselor
+    if (loggedCounselor) {
+      const current = updatedList.find(c => c.id === loggedCounselor.id);
+      if (current) {
+        setLoggedCounselor(current);
+      } else if (updatedList.length > 0) {
+        setLoggedCounselor(updatedList[0]);
+      }
+    }
+  };
+
   const handleNavigate = (tab: string) => {
     setActiveTab(tab);
+    // Refresh counselors whenever navigating to student views
+    if (tab === 'siswa-home' || tab === 'kontak-bk') {
+      fetchCounselors();
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSwitchPortal = (portal: 'landing' | 'siswa' | 'counselor') => {
     setCurrentPortal(portal);
+    fetchCounselors();
     if (portal === 'landing') {
       setActiveTab('landing');
     } else if (portal === 'siswa') {
@@ -104,6 +140,7 @@ export default function App() {
           <>
             {activeTab === 'siswa-home' && (
               <StudentHome
+                counselors={counselors}
                 onNavigate={handleNavigate}
                 onBackToLanding={() => handleSwitchPortal('landing')}
               />
@@ -149,6 +186,7 @@ export default function App() {
 
             {activeTab === 'kontak-bk' && (
               <CounselorContact
+                counselors={counselors}
                 onBack={() => handleNavigate('siswa-home')}
               />
             )}
@@ -166,6 +204,8 @@ export default function App() {
             ) : (
               <CounselorDashboard
                 counselor={loggedCounselor}
+                counselors={counselors}
+                onUpdateCounselorsList={handleUpdateCounselors}
                 onLogout={handleCounselorLogout}
               />
             )}

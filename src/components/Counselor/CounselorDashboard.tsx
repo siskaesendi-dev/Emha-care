@@ -8,13 +8,26 @@ import { CounselorManagementView } from './CounselorManagementView';
 
 interface CounselorDashboardProps {
   counselor: Counselor;
+  counselors?: Counselor[];
+  onUpdateCounselorsList?: (updatedList: Counselor[]) => void;
   onLogout: () => void;
 }
 
-export const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ counselor, onLogout }) => {
+export const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ 
+  counselor, 
+  counselors: initialCounselorsProp, 
+  onUpdateCounselorsList, 
+  onLogout 
+}) => {
   const [reports, setReports] = useState<Report[]>([]);
-  const [counselorsList, setCounselorsList] = useState<Counselor[]>([]);
+  const [counselorsList, setCounselorsList] = useState<Counselor[]>(initialCounselorsProp || []);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (initialCounselorsProp && initialCounselorsProp.length > 0) {
+      setCounselorsList(initialCounselorsProp);
+    }
+  }, [initialCounselorsProp]);
   
   // Active Sub-view
   const [activeSubView, setActiveSubView] = useState<'CASES' | 'INDICATOR_LOGIC' | 'ANALYTICS' | 'MANAGE_COUNSELORS'>('CASES');
@@ -170,7 +183,12 @@ export const CounselorDashboard: React.FC<CounselorDashboardProps> = ({ counselo
       <CounselorManagementView
         counselors={counselorsList}
         onBack={() => setActiveSubView('CASES')}
-        onUpdateCounselors={(updated) => setCounselorsList(updated)}
+        onUpdateCounselors={(updated) => {
+          setCounselorsList(updated);
+          if (onUpdateCounselorsList) {
+            onUpdateCounselorsList(updated);
+          }
+        }}
       />
     );
   }
